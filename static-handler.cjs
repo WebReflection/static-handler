@@ -92,7 +92,7 @@ function help(code, ...rest) {
 \x1b[7m\x1b[1m  static-handler  \x1b[0m  \x1b[2mby Andrea Giammarchi\x1b[0m
   ${ERROR ? `\n\x1b[31m\x1b[7m\x1b[1m  ${rest[0].padEnd(15, ' ')} \x1b[0m \x1b[1m${rest[1]}\x1b[0m\n` : ''}
   A very simple static files handler,
-  used in this binary to serve any file.
+  used in this script to serve any file.
 
   \x1b[1moptions\x1b[0m
 
