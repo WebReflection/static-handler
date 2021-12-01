@@ -1,0 +1,47 @@
+{
+  "name": "static-handler",
+  "version": "0.0.1",
+  "description": "A very simple static files handler",
+  "main": "./cjs/index.js",
+  "bin": {
+    "static-handler": "static-handler.cjs"
+  },
+  "scripts": {
+    "build": "npm run cjs && npm run test",
+    "cjs": "ascjs --no-default esm cjs",
+    "test": "node test/index.js"
+  },
+  "keywords": [
+    "static",
+    "handler",
+    "server"
+  ],
+  "author": "Andrea Giammarchi",
+  "license": "ISC",
+  "devDependencies": {
+    "ascjs": "^5.0.1"
+  },
+  "module": "./esm/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "default": "./cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "mime-type": "^4.0.0"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/static-handler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/static-handler/issues"
+  },
+  "homepage": "https://github.com/WebReflection/static-handler#readme"
+}
