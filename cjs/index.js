@@ -47,9 +47,10 @@ module.exports = (baseDir, headers = {}) =>
         return false;
       }
     }
-    else if (stats.isDirectory()) {
+
+    if (stats.isDirectory())
       return handler({method: 'GET', url: url + '/'}, res);
-    }
+
     return false;
   }
 ;

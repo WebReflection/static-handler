@@ -27,7 +27,7 @@ const args = argv.slice(2);
 let {PORT = 8080} = env;
 let CORS = false;
 let VERBOSE = false;
-let dir = __dirname;
+let dir = process.cwd();
 
 for (let i = 0, {length} = args; i < length; i++) {
   if (args[i].startsWith('-')) {
