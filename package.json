@@ -31,10 +31,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "mime-type": "^4.0.0"
-  },
-  "directories": {
-    "test": "test"
+    "mime": "^3.0.0"
   },
   "repository": {
     "type": "git",

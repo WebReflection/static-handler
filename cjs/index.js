@@ -1,7 +1,6 @@
 'use strict';
-const {basename} = require('path');
 const {createReadStream, statSync} = require('fs');
-const contentType = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('mime-type'));
+const mime = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('mime'));
 
 /**
  * Returns a very basic response handler (http / express) that
@@ -38,7 +37,7 @@ module.exports = (baseDir, headers = {}) =>
       try {
         res.writeHead(200, {
           ...headers,
-          'content-type': contentType(basename(url))
+          'content-type': mime.getType(url)
         });
         createReadStream(baseDir + url).pipe(res);
         return true;

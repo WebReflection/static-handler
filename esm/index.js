@@ -1,6 +1,5 @@
-import {basename} from 'path';
 import {createReadStream, statSync} from 'fs';
-import contentType from 'mime-type';
+import mime from 'mime';
 
 /**
  * Returns a very basic response handler (http / express) that
@@ -37,7 +36,7 @@ export default (baseDir, headers = {}) =>
       try {
         res.writeHead(200, {
           ...headers,
-          'content-type': contentType(basename(url))
+          'content-type': mime.getType(url)
         });
         createReadStream(baseDir + url).pipe(res);
         return true;
