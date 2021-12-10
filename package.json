@@ -18,6 +18,10 @@
   ],
   "author": "Andrea Giammarchi",
   "license": "ISC",
+  "engines": {
+    "node": ">=16"
+  },
+  "engineStrict": true,
   "devDependencies": {
     "ascjs": "^5.0.1"
   },
