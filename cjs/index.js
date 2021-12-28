@@ -3,6 +3,10 @@ const {basename} = require('path');
 const {createReadStream, statSync} = require('fs');
 const mime = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('mime-types'));
 
+const MIN_BUFFER = 1024 * 1024;
+const {min} = Math;
+const rangeExp = /^bytes=(\d+)-(\d*)/;
+
 /**
  * Returns a very basic response handler (http / express) that
  * will serve static files right away, only if present.
@@ -18,7 +22,7 @@ module.exports = (baseDir, headers = {}) =>
    * @param {import('http').ServerResponse} res the server response
    * @returns {boolean}
    */
-  function handler({method, url}, res) {
+  function handler({method, url, headers: {range}}, res) {
     if (method !== "GET")
       return false;
 
@@ -35,12 +39,36 @@ module.exports = (baseDir, headers = {}) =>
       return false;
 
     if (stats.isFile()) {
+      const {size} = stats;
+      let status = 0;
       try {
-        res.writeHead(200, {
-          ...headers,
-          'content-type': mime.contentType(basename(url))
-        });
-        createReadStream(baseDir + url).pipe(res);
+        if (rangeExp.test(range || '')) {
+          const {$1, $2} = RegExp;
+          const start = parseInt($1, 10) || 0;
+          if (start >= size)
+            throw (status = 416);
+
+          let end = parseInt($2, 10) || 0;
+          if (!end || end >= size)
+            end = min(size, start + MIN_BUFFER) - 1;
+
+          res.writeHead(status = 206, {
+            ...headers,
+            'Accept-Range': 'bytes',
+            'Content-Range': `bytes ${start}-${end}/${size}`,
+            'Content-Length': (end + 1) - start,
+            'Content-Type': mime.contentType(basename(url))
+          });
+          createReadStream(baseDir + url, {start, end}).pipe(res);
+        }
+        else {
+          res.writeHead(status = 200, {
+            ...headers,
+            'Content-Length': size,
+            'Content-Type': mime.contentType(basename(url))
+          });
+          createReadStream(baseDir + url).pipe(res);
+        }
         return true;
       }
       catch (o_O) {
