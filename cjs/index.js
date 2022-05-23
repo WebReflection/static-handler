@@ -22,7 +22,7 @@ module.exports = (baseDir, headers = {}) =>
    * @param {import('http').ServerResponse} res the server response
    * @returns {boolean}
    */
-  function handler({method, url, headers: {range}}, res) {
+  function handler({method, url, headers: {range} = {}}, res) {
     if (method !== "GET")
       return false;
 
