@@ -45,7 +45,8 @@ for (let i = 0, {length} = args; i < length; i++) {
         break;
       case '-p':
       case '--port':
-        if ((i + 1) < length && /^\d+$/.test(i + 1)) {
+        if ((i + 1) < length && /^\d+$/.test(args[i + 1])) {
+          i++;
           PORT = parseInt(args[i], 10);
           break;
         }
