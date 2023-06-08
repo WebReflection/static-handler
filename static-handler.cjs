@@ -24,10 +24,8 @@ const {resolve} = require('path');
 const {env, argv} = process;
 const args = argv.slice(2);
 
+let CORS, COOP, COEP, CORP;
 let {PORT = 8080} = env;
-let CORS = false;
-let COOP = false;
-let COEP = false;
 let VERBOSE = false;
 let dir = process.cwd();
 
@@ -43,13 +41,16 @@ for (let i = 0, {length} = args; i < length; i++) {
         VERBOSE = true;
         break;
       case '--cors':
-        CORS = true;
+        CORS = {'Access-Control-Allow-Origin': '*'};
         break;
       case '--coop':
-        COOP = true;
+        COOP = {'Cross-Origin-Opener-Policy': 'same-origin'};
         break;
       case '--coep':
-        COEP = true;
+        COEP = {'Cross-Origin-Embedder-Policy': 'require-corp'};
+        break;
+      case '--corp':
+        CORP = {'Cross-Origin-Resource-Policy': 'cross-origin'};
         break;
       case '':
         break;
@@ -75,11 +76,7 @@ for (let i = 0, {length} = args; i < length; i++) {
 
 const handler = require('./cjs/index.js')(
   dir,
-  Object.assign({},
-    CORS ? {'Access-Control-Allow-Origin': '*'} : void 0,
-    COOP ? {'Cross-Origin-Opener-Policy': 'same-origin'} : void 0,
-    COEP ? {'Cross-Origin-Embedder-Policy': 'require-corp'} : void 0,
-  )
+  Object.assign({}, CORS, COOP, COEP, CORP)
 );
 
 const server = require('http').createServer((req, res) => {
