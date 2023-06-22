@@ -47,10 +47,11 @@ for (let i = 0, {length} = args; i < length; i++) {
         COOP = {'Cross-Origin-Opener-Policy': 'same-origin'};
         break;
       case '--coep':
-        COEP = {'Cross-Origin-Embedder-Policy': 'require-corp'};
+        COEP = {'Cross-Origin-Embedder-Policy': CORP ? 'require-corp' : 'credentialless'};
         break;
       case '--corp':
         CORP = {'Cross-Origin-Resource-Policy': 'cross-origin'};
+        if (COEP) COEP['Cross-Origin-Embedder-Policy'] = 'require-corp';
         break;
       case '':
         break;
