@@ -25,11 +25,12 @@ const {env, argv} = process;
 const args = argv.slice(2);
 
 let CORS, COOP, COEP, CORP;
+let PATH = '/';
 let {PORT = 8080} = env;
 let VERBOSE = false;
 let dir = process.cwd();
 
-for (let i = 0, {length} = args; i < length; i++) {
+for (let i = 0; i < args.length; i++) {
   if (args[i].startsWith('-')) {
     switch (args[i]) {
       case '-h':
@@ -39,6 +40,16 @@ for (let i = 0, {length} = args; i < length; i++) {
       case '-v':
       case '--verbose':
         VERBOSE = true;
+        break;
+      case '--path':
+        if ((i + 1) < args.length) {
+          i++;
+          PATH = `/${args[i]}/`.replace(/^\/{2,}/, '/');
+          break;
+        }
+        break;
+      case '--coi':
+        args.push('--cors', '--coep', '--coop', '--corp');
         break;
       case '--cors':
         CORS = {'Access-Control-Allow-Origin': '*'};
@@ -57,7 +68,7 @@ for (let i = 0, {length} = args; i < length; i++) {
         break;
       case '-p':
       case '--port':
-        if ((i + 1) < length && /^\d+$/.test(args[i + 1])) {
+        if ((i + 1) < args.length && /^\d+$/.test(args[i + 1])) {
           i++;
           PORT = parseInt(args[i], 10);
           break;
@@ -94,9 +105,15 @@ const server = require('http').createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  if (VERBOSE)
-    console.log(`\n\x1b[7m\x1b[1m static-handler \x1b[0m \x1b[2m--verbose${CORS ? ' --cors' : ''}\x1b[0m`);
-  console.log(`\x1b[1mhttp://localhost:${PORT}/\x1b[0m \x1b[2m@ ${dir}\x1b[0m`);
+  if (VERBOSE) {
+    const extras = ['--verbose'];
+    if (CORS) extras.push('--cors');
+    if (COOP) extras.push('--coop');
+    if (COEP) extras.push('--coep');
+    if (CORP) extras.push('--corp');
+    console.log(`\n\x1b[7m\x1b[1m static-handler \x1b[0m \x1b[2m${extras.join(' ')}\x1b[0m`);
+  }
+  console.log(`\x1b[1mhttp://localhost:${PORT}${PATH}\x1b[0m \x1b[2m@ ${dir}\x1b[0m`);
 });
 
 function help(code, ...rest) {
@@ -112,7 +129,14 @@ function help(code, ...rest) {
     --port | -p XXXX  \x1b[2moptional port to use\x1b[0m
     --verbose | -v    \x1b[2mlogs requirested files\x1b[0m
     --help | -h       \x1b[2mthis message${ERROR ? ' without errors' : ''}\x1b[0m
-    --cors            \x1b[2mallow cors for \x1b[0m*\x1b[2m origins\x1b[0m
+    --path /dir       \x1b[2muse \x1b[0m/dir/\x1b[2m as base path\x1b[0m
+    --cors            \x1b[2mset \x1b[0mAccess-Control-Allow-Origin\x1b[2m as \x1b[0m*\x1b[2m origins\x1b[0m
+    --coop            \x1b[2mset \x1b[0mCross-Origin-Opener-Policy\x1b[2m as \x1b[0msame-origin\x1b[2m\x1b[0m
+    --coep            \x1b[2mset \x1b[0mCross-Origin-Embedder-Policy\x1b[2m as \x1b[0mrequire-corp\x1b[2m,
+                      with CORP enabled, or \x1b[0mcredentialless\x1b[2m otherwise\x1b[0m
+    --corp            \x1b[2mset \x1b[0mCross-Origin-Resource-Policy\x1b[2m as \x1b[0mcross-origin\x1b[2m,
+                      forcing COEP as \x1b[0mrequire-corp\x1b[2m\x1b[0m
+    --coi             \x1b[2menables --cors --coep --coop --corp\x1b[2m\x1b[0m
 `);
   process.exit(code);
 }
