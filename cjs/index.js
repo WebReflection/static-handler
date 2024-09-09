@@ -1,7 +1,7 @@
 'use strict';
-const {basename} = require('path');
+const {extname} = require('path');
 const {createReadStream, statSync} = require('fs');
-const mime = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('mime-types'));
+const mime = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('./mime.js'));
 
 const MIN_BUFFER = 1024 * 1024;
 const {min} = Math;
@@ -57,7 +57,7 @@ module.exports = (baseDir, headers = {}) =>
             'Accept-Range': 'bytes',
             'Content-Range': `bytes ${start}-${end}/${size}`,
             'Content-Length': (end + 1) - start,
-            'Content-Type': mime.contentType(basename(url))
+            'Content-Type': mime[extname(url)]
           });
           createReadStream(baseDir + url, {start, end}).pipe(res);
         }
@@ -65,7 +65,7 @@ module.exports = (baseDir, headers = {}) =>
           res.writeHead(status = 200, {
             ...headers,
             'Content-Length': size,
-            'Content-Type': mime.contentType(basename(url))
+            'Content-Type': mime[extname(url)]
           });
           createReadStream(baseDir + url).pipe(res);
         }

@@ -1,6 +1,6 @@
-import {basename} from 'path';
+import {extname} from 'path';
 import {createReadStream, statSync} from 'fs';
-import mime from 'mime-types';
+import mime from './mime.js';
 
 const MIN_BUFFER = 1024 * 1024;
 const {min} = Math;
@@ -56,7 +56,7 @@ export default (baseDir, headers = {}) =>
             'Accept-Range': 'bytes',
             'Content-Range': `bytes ${start}-${end}/${size}`,
             'Content-Length': (end + 1) - start,
-            'Content-Type': mime.contentType(basename(url))
+            'Content-Type': mime[extname(url)]
           });
           createReadStream(baseDir + url, {start, end}).pipe(res);
         }
@@ -64,7 +64,7 @@ export default (baseDir, headers = {}) =>
           res.writeHead(status = 200, {
             ...headers,
             'Content-Length': size,
-            'Content-Type': mime.contentType(basename(url))
+            'Content-Type': mime[extname(url)]
           });
           createReadStream(baseDir + url).pipe(res);
         }
