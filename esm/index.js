@@ -1,4 +1,4 @@
-import {extname} from 'path';
+import {extname, resolve} from 'path';
 import {createReadStream, statSync} from 'fs';
 import mime from './mime.js';
 
@@ -39,35 +39,40 @@ export default (baseDir, headers = {}) =>
 
     if (stats.isFile()) {
       const {size} = stats;
-      let status = 0;
+      const contentType = mime[extname(url)];
+      if (!contentType) return false;
+      const head = [];
+      const stream = [resolve(baseDir, '.' + url)];
       try {
         if (rangeExp.test(range || '')) {
           const {$1, $2} = RegExp;
           const start = parseInt($1, 10) || 0;
           if (start >= size)
-            throw (status = 416);
+            throw 416;
 
           let end = parseInt($2, 10) || 0;
           if (!end || end >= size)
             end = min(size, start + MIN_BUFFER) - 1;
 
-          res.writeHead(status = 206, {
+          head.push(206, {
             ...headers,
             'Accept-Range': 'bytes',
             'Content-Range': `bytes ${start}-${end}/${size}`,
             'Content-Length': (end + 1) - start,
-            'Content-Type': mime[extname(url)]
+            'Content-Type': contentType,
           });
-          createReadStream(baseDir + url, {start, end}).pipe(res);
+
+          stream.push({start, end});
         }
         else {
-          res.writeHead(status = 200, {
+          head.push(200, {
             ...headers,
             'Content-Length': size,
-            'Content-Type': mime[extname(url)]
+            'Content-Type': contentType,
           });
-          createReadStream(baseDir + url).pipe(res);
         }
+        res.writeHead(...head);
+        createReadStream(...stream).pipe(res);
         return true;
       }
       catch (o_O) {
