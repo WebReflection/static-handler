@@ -24,8 +24,8 @@
   },
   "engineStrict": true,
   "devDependencies": {
-    "ascjs": "^5.0.1",
-    "just-mime": "^0.3.6"
+    "ascjs": "^6.0.3",
+    "just-mime": "^0.4.1"
   },
   "module": "./esm/index.js",
   "type": "module",

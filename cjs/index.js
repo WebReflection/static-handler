@@ -1,7 +1,7 @@
 'use strict';
 const {extname, resolve} = require('path');
 const {createReadStream, statSync} = require('fs');
-const mime = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('./mime.js'));
+const mime = (require('./mime.js'));
 
 const MIN_BUFFER = 1024 * 1024;
 const {min} = Math;
