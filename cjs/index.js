@@ -40,8 +40,7 @@ module.exports = (baseDir, headers = {}) =>
 
     if (stats.isFile()) {
       const {size} = stats;
-      const contentType = mime[extname(url)];
-      if (!contentType) return false;
+      const contentType = mime[extname(url)] || 'application/octet-stream';
       const head = [];
       const stream = [resolve(baseDir, '.' + url)];
       try {
